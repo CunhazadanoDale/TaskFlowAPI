@@ -10,14 +10,14 @@ import (
 
 type ProjectService struct {
 	// Define project-related methods here
-	ProjectRepository ports.ProjectRepository
-	UserRepository    ports.UserRepository
+	projectRepository ports.ProjectRepository
+	userRepository    ports.UserRepository
 }
 
 func NewProjectService(projectRepo ports.ProjectRepository, userRepo ports.UserRepository) *ProjectService {
 	return &ProjectService{
-		ProjectRepository: projectRepo,
-		UserRepository:    userRepo,
+		projectRepository: projectRepo,
+		userRepository:    userRepo,
 	}
 }
 
