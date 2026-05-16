@@ -25,8 +25,11 @@ func NewProject(name string, description string, ownerId uuid.UUID) (*Project, e
 	}
 
 	return &Project{
+		ID: uuid.New(),
 		Name:        name,
 		Description: description,
 		OwnerId:     ownerId,
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
 	}, nil
 }

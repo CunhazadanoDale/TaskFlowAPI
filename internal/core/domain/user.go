@@ -11,7 +11,7 @@ type User struct {
 	ID    uuid.UUID `json:"id" db:"id"`
 	Name  string    `json:"name" db:"name"`
 	Email string    `json:"email" db:"email"`
-	Password string    `json:"password" db:"password"`
+	PasswordHash string    `json:"password" db:"password"`
 	CreatedAt time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
 }
@@ -29,8 +29,11 @@ func NewUser(name string, email string, password string) (*User, error) {
 	}
 
 	return &User{
+		ID:   uuid.New(),
 		Name: name,
 		Email: email,
-		Password: password,
+		PasswordHash: password,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}, nil
 }
