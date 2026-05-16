@@ -15,6 +15,7 @@ type Task struct {
 	Priority    Priority  `json:"priority" db:"priority"`
 	DueDate     time.Time `json:"due_date" db:"due_date"`
 	ProjectId   uuid.UUID `json:"project_id" db:"project_id"`
+	AssigneeId  uuid.UUID `json:"assignee_id" db:"assignee_id"`
 	CreatedBy   uuid.UUID `json:"created_by" db:"created_by"`
 	CreatedAt   time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at" db:"updated_at"`
@@ -37,12 +38,15 @@ const (
 	PriorityHigh   Priority = "HIGH"
 )
 
-func NewTask(title string, description string, status Status, priority Priority, dueDate time.Time, projectId uuid.UUID, createdBy uuid.UUID) (*Task, error) {
+func NewTask(title string, description string, status Status, priority Priority, dueDate time.Time, projectId uuid.UUID, assigneeId uuid.UUID, createdBy uuid.UUID) (*Task, error) {
 	if title == "" {
 		return nil, errors.New("task title is required")
 	}
 	if projectId == uuid.Nil || createdBy == uuid.Nil {
 		return nil, errors.New("project ID and created-by ID are required")
+	}
+	if assigneeId == uuid.Nil {
+		return nil, errors.New("assignee ID is required")
 	}
 
 	return &Task{
@@ -50,8 +54,15 @@ func NewTask(title string, description string, status Status, priority Priority,
 		Description: description,
 		Status: status,
 		Priority: priority,
+		AssigneeId: assigneeId,
 		DueDate: dueDate,
 		ProjectId: projectId,
 		CreatedBy: createdBy,
 	}, nil
+}
+
+
+func CanBeEditedBy(userId uuid.UUID, task *Task) bool {
+	// Implement logic to check if the user has permission to edit the task
+	return userId == task.AssigneeId || userId == task.CreatedBy
 }
