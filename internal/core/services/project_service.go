@@ -8,44 +8,36 @@ import (
 	"github.com/google/uuid"
 )
 
-type UserService struct {
-	// Define user-related methods here
-	userRepository ports.UserRepository
+type ProjectService struct {
+	// Define project-related methods here
+	ProjectRepository ports.ProjectRepository
+	UserRepository    ports.UserRepository
 }
 
-func NewUserService(userRepo ports.UserRepository) *UserService {
-	return &UserService{
-		userRepository: userRepo,
+func NewProjectService(projectRepo ports.ProjectRepository, userRepo ports.UserRepository) *ProjectService {
+	return &ProjectService{
+		ProjectRepository: projectRepo,
+		UserRepository:    userRepo,
 	}
 }
 
 
-func (s *UserService) RegisterUser(ctx context.Context, name string, email string, password string) error {
-	// Implement user creation logic here, including validation and password hashing
+func (s *ProjectService) CreateProject(ctx context.Context, name string, description string, ownerID uuid.UUID) error {
+	// Implement project creation logic here, including validation and ownership assignment
 	return nil
 }
 
-func (s *UserService) GetUserByID(ctx context.Context, userID uuid.UUID) (*domain.User, error) {
-	// Implement logic to retrieve a user by their ID
+func (s *ProjectService) GetProjectByID(ctx context.Context, projectID uuid.UUID) (*domain.Project, error) {
+	// Implement logic to retrieve a project by its ID
 	return nil, nil
 }
 
-func (s *UserService) GetUserByEmail(ctx context.Context, email string) (*domain.User, error) {
-	// Implement logic to retrieve a user by their email
-	return nil, nil
-}
-
-func (s *UserService) AuthenticateUser(ctx context.Context, email string, password string) (*domain.User, error) {
-	// Implement user authentication logic here, including password verification
-	return nil, nil
-} 
-
-func (s *UserService) UpdateUser(ctx context.Context, userID uuid.UUID, name string, email string) error {
-	// Implement logic to update user information
+func (s *ProjectService) UpdateProject(ctx context.Context, projectID uuid.UUID, name string, description string) error {
+	// Implement logic to update project information
 	return nil
 }
 
-func (s *UserService) DeleteUser(ctx context.Context, userID uuid.UUID) error {
-	// Implement logic to delete a user
+func (s *ProjectService) DeleteProject(ctx context.Context, projectID uuid.UUID) error {
+	// Implement logic to delete a project, including handling related tasks and permissions
 	return nil
 }
