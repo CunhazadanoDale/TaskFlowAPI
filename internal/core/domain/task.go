@@ -38,7 +38,7 @@ const (
 	PriorityHigh   Priority = "high"
 )
 
-func NewTask(title string, description string, status Status, priority Priority, dueDate time.Time, projectId uuid.UUID, assigneeId uuid.UUID, createdBy uuid.UUID) (*Task, error) {
+func NewTask(title string, description string, status Status, priority Priority, dueDate *time.Time, projectId uuid.UUID, assigneeId *uuid.UUID, createdBy uuid.UUID) (*Task, error) {
 	if title == "" {
 		return nil, errors.New("task title is required")
 	}
@@ -52,8 +52,8 @@ func NewTask(title string, description string, status Status, priority Priority,
 		Description: description,
 		Status: status,
 		Priority: priority,
-		AssigneeId: &assigneeId,
-		DueDate: &dueDate,
+		AssigneeId: assigneeId,
+		DueDate: dueDate,
 		ProjectId: projectId,
 		CreatedBy: createdBy,
 		CreatedAt: time.Now(),
