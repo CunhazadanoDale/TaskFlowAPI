@@ -28,14 +28,14 @@ type TaskRepository interface {
 	// Define methods for task repository
 	CreateTask(ctx context.Context, task *domain.Task) error
 	GetTaskByID(ctx context.Context, id uuid.UUID) (*domain.Task, error)
-	GetTasksByAssigneeID(ctx context.Context, assigneeId uuid.UUID) ([]*domain.Task, error)
+	GetTasksByAssigneeID(ctx context.Context, assigneeId uuid.UUID, filtro domain.PaginacaoFiltro) ([]*domain.Task, int, error)
 	UpdateTask(ctx context.Context, task *domain.Task) error
 	DeleteTask(ctx context.Context, id uuid.UUID) error
-	GetTasksByProjectID(ctx context.Context, projectId uuid.UUID) ([]*domain.Task, error)
+	GetTasksByProjectID(ctx context.Context, projectId uuid.UUID, filtro domain.PaginacaoFiltro) ([]*domain.Task, int, error)
 }
 
 type TaskHistoryRepository interface {
 	// Define methods for task history repository
 	CreateTaskHistory(ctx context.Context, history *domain.TaskHistory) error
-	GetTaskHistoryByTaskID(ctx context.Context, taskId uuid.UUID, filtro domain.PaginacaoFiltro) ([]*domain.TaskHistory, error)
+	GetTaskHistoryByTaskID(ctx context.Context, taskId uuid.UUID, filtro domain.PaginacaoFiltro) ([]*domain.TaskHistory, int, error)
 }
