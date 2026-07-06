@@ -37,5 +37,5 @@ type TaskRepository interface {
 type TaskHistoryRepository interface {
 	// Define methods for task history repository
 	CreateTaskHistory(ctx context.Context, history *domain.TaskHistory) error
-	GetTaskHistoryByTaskID(ctx context.Context, taskId uuid.UUID) ([]*domain.TaskHistory, error)
+	GetTaskHistoryByTaskID(ctx context.Context, taskId uuid.UUID, filtro domain.PaginacaoFiltro) ([]*domain.TaskHistory, error)
 }
