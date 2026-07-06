@@ -23,7 +23,7 @@ func (t *TaskHistoryRepository) CreateTaskHistory(ctx context.Context, history *
 }
 
 // GetTaskHistoryByTaskID implements [ports.TaskHistoryRepository].
-func (t *TaskHistoryRepository) GetTaskHistoryByTaskID(ctx context.Context, taskId uuid.UUID, filtro domain.PaginacaoFiltro) ([]*domain.TaskHistory, error) {
+func (t *TaskHistoryRepository) GetTaskHistoryByTaskID(ctx context.Context, taskId uuid.UUID, filtro domain.PaginacaoFiltro) ([]*domain.TaskHistory, int, error) {
 	
 	offset := (filtro.Page - 1) * filtro.PageSize
 
@@ -33,20 +33,27 @@ func (t *TaskHistoryRepository) GetTaskHistoryByTaskID(ctx context.Context, task
 	var histories []*domain.TaskHistory
 	rows, err := t.db.Query(ctx, query, taskId, filtro.PageSize, offset)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	defer rows.Close()
+
+	countQuery := `SELECT COUNT(*) FROM task_history WHERE task_id = $1`
+	var count int
+	err = t.db.QueryRow(ctx, countQuery, taskId).Scan(&count)
+	if err != nil {
+		return nil, 0, err
+	}
 
 	for rows.Next() {
 		var history domain.TaskHistory
 		err := rows.Scan(&history.ID, &history.TaskId, &history.ChangedBy, &history.Field, &history.OldValue, &history.NewValue, &history.ChangedAt)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 		histories = append(histories, &history)
 	}
 
-	return histories, nil
+	return histories, count, nil
 }
 
 func NewTaskHistoryRepository(db *pgxpool.Pool) *TaskHistoryRepository {
