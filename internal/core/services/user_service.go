@@ -24,26 +24,20 @@ func NewUserService(userRepo ports.UserRepository) *UserService {
 
 func (s *UserService) RegisterUser(ctx context.Context, name string, email string, password string) error {
 	nome := strings.TrimSpace(name)
-	mail = strings.TrimSpace(email)
-	senha = strings.TrimSpace(password)
+	mail := strings.TrimSpace(email)
+	senha := strings.TrimSpace(password)
 
 	if nome == "" || mail == "" || senha == "" {
 		return domain.ErrInvalidInput
 	}
 
-	now := time.Now()
-
-	user := &domain.User{
-		ID:           uuid.New(),
-		Name:         nome,
-		Email:        mail,
-		PasswordHash: hashPassword(senha), // Implement password hashing
-		CreatedAt:    now,
-		UpdatedAt:    now,
+	if _, err := s.userRepository.GetUserByEmail(ctx, mail); err == nil {
+		return domain.ErrConflict
 	}
 
-	if userFromDB, _ := s.userRepository.GetUserByEmail(ctx, user); userFromDB != nil {
-		return domain.ErrConflict
+	user, err := domain.NewUser(nome, mail, HashPassword(senha))
+	if err != nil {
+		return err
 	}
 
 	return s.userRepository.CreateUser(ctx, user)
@@ -51,26 +45,62 @@ func (s *UserService) RegisterUser(ctx context.Context, name string, email strin
 }
 
 func (s *UserService) GetUserByID(ctx context.Context, userID uuid.UUID) (*domain.User, error) {
-	// Implement logic to retrieve a user by their ID
-	return nil, nil
+	user, err := s.userRepository.GetUserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
 }
 
 func (s *UserService) GetUserByEmail(ctx context.Context, email string) (*domain.User, error) {
-	// Implement logic to retrieve a user by their email
-	return nil, nil
+	user, err := s.userRepository.GetUserByEmail(ctx, email)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
 
 func (s *UserService) AuthenticateUser(ctx context.Context, email string, password string) (*domain.User, error) {
-	// Implement user authentication logic here, including password verification
-	return nil, nil
-} 
+	mail := strings.TrimSpace(email)
+	senha := strings.TrimSpace(password)
+
+	if mail == "" || senha == "" {
+		return nil, domain.ErrInvalidInput
+	}
+
+	user, err := s.userRepository.GetUserByEmail(ctx, mail)
+	if err != nil {
+		return nil, err
+	}
+
+	if !CheckPasswordHash(senha, user.PasswordHash) { // Implement password hash checking
+		return nil, domain.ErrUnauthorized
+	}
+
+	return user, nil
+}
 
 func (s *UserService) UpdateUser(ctx context.Context, userID uuid.UUID, name string, email string) error {
-	// Implement logic to update user information
-	return nil
+	nome := strings.TrimSpace(name)
+	mail := strings.TrimSpace(email)
+
+	if nome == "" || mail == "" {
+		return domain.ErrInvalidInput
+	}
+
+	user, err := s.userRepository.GetUserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+
+	user.Name = nome
+	user.Email = mail
+	user.UpdatedAt = time.Now()
+
+	return s.userRepository.UpdateUser(ctx, user)
 }
 
 func (s *UserService) DeleteUser(ctx context.Context, userID uuid.UUID) error {
-	// Implement logic to delete a user
-	return nil
+	return s.userRepository.DeleteUser(ctx, userID)
 }
