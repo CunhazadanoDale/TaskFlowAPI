@@ -2,6 +2,8 @@ package services
 
 import (
 	"context"
+	"strings"
+	"time"
 
 	"github.com/CunhazadanoDale/TaskFlowAPI/internal/core/domain"
 	"github.com/CunhazadanoDale/TaskFlowAPI/internal/core/ports"
@@ -21,8 +23,31 @@ func NewUserService(userRepo ports.UserRepository) *UserService {
 
 
 func (s *UserService) RegisterUser(ctx context.Context, name string, email string, password string) error {
-	// Implement user creation logic here, including validation and password hashing
-	return nil
+	nome := strings.TrimSpace(name)
+	mail = strings.TrimSpace(email)
+	senha = strings.TrimSpace(password)
+
+	if nome == "" || mail == "" || senha == "" {
+		return domain.ErrInvalidInput
+	}
+
+	now := time.Now()
+
+	user := &domain.User{
+		ID:           uuid.New(),
+		Name:         nome,
+		Email:        mail,
+		PasswordHash: hashPassword(senha), // Implement password hashing
+		CreatedAt:    now,
+		UpdatedAt:    now,
+	}
+
+	if userFromDB, _ := s.userRepository.GetUserByEmail(ctx, user); userFromDB != nil {
+		return domain.ErrConflict
+	}
+
+	return s.userRepository.CreateUser(ctx, user)
+	
 }
 
 func (s *UserService) GetUserByID(ctx context.Context, userID uuid.UUID) (*domain.User, error) {
